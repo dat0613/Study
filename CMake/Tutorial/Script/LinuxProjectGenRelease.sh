@@ -1,0 +1,1 @@
+cmake -H../src -B/Generated/Linux -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"
