@@ -1,3 +1,3 @@
-cmake --build /Generated/Windows
+cmake --build ../src/Generated/Windows
 
 pause

@@ -1,1 +1,1 @@
-cmake --build /Generated/Linux ./
+cmake --build ./../src/Generated/Linux ./
