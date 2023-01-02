@@ -3,6 +3,8 @@ project(CMakeTutorial)
 
 set(CMAKE_CXX_STANDARD 20)
 
+add_compile_definitions(NOMINMAX)
+
 add_subdirectory(executable-example)
 add_subdirectory(shared-library-example)
 add_subdirectory(static-library-example)
