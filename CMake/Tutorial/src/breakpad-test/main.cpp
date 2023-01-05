@@ -12,6 +12,7 @@
 #include <client/crashpad_info.h>
 
 std::unique_ptr<crashpad::CrashReportDatabase> database;
+crashpad::CrashpadClient client;
 
 static bool startCrashHandler(std::string const& url, base::FilePath::StringType const& handler_path, base::FilePath::StringType const& db_path)
 {
@@ -20,6 +21,8 @@ static bool startCrashHandler(std::string const& url, base::FilePath::StringType
     std::map<std::string, std::string> annotations;
     std::vector<std::string> arguments;
     bool rc;
+
+    crashpad::AnnotationList::Register();
 
     annotations["format"] = "minidump";
     arguments.push_back("--no-rate-limit");
@@ -36,11 +39,9 @@ static bool startCrashHandler(std::string const& url, base::FilePath::StringType
 
     std::cerr << __LINE__ << '\n';
 
-    database->GetSettings()->SetUploadsEnabled(true);
+    //database->GetSettings()->SetUploadsEnabled(true);
 
-    return CrashpadClient{}.StartHandler(
-        handler, db, db, url, annotations, arguments, false, false, {}
-    );
+    return client.StartHandler(handler, db, db, url, annotations, arguments, false, false);
 }
 
 void Crash()
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
     std::cout << "Crashpad URL: " << url << '\n';
     std::wcout << "Crashpad handler: " << handler_path << '\n';
     std::wcout << "Crashpad database: " << db_path << '\n';
-    std::cerr << startCrashHandler(url, handler_path, db_path) << '\n';
+    std::cout << (startCrashHandler(url, handler_path, db_path) ? "true" : "false") << '\n';
 
     int should_crash = 1;
     if (should_crash)
