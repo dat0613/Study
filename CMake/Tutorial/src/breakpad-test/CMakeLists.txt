@@ -1,5 +1,16 @@
 add_executable(breakpad-test main.cpp)
 
+message("CMAKE_BINARY_DIR : ${CMAKE_BINARY_DIR}")
+message("CMAKE_CXX_COMPILER_ID : ${CMAKE_CXX_COMPILER_ID}")
+message("CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE}")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC" AND CMAKE_BUILD_TYPE MATCHES "Release")
+	target_compile_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/Zi>")
+	target_link_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
+	target_link_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
+	target_link_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
+endif()
+
 target_include_directories(breakpad-test
 PUBLIC
 	${CRASHPAD_INCLUDE_DIR}

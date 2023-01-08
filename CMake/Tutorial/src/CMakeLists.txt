@@ -24,6 +24,4 @@ PUBLIC
     static-library-example
 )
 
-message("${CMAKE_SOURCE_DIR}/static-library-example/include")
-
 target_include_directories(executable-example PUBLIC "${CMAKE_SOURCE_DIR}/static-library-example/include")
