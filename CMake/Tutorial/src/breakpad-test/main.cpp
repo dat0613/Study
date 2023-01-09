@@ -11,6 +11,8 @@
 #include <client/crashpad_client.h>
 #include <client/crashpad_info.h>
 
+#include "private_environment.hpp"
+
 std::unique_ptr<crashpad::CrashReportDatabase> database;
 crashpad::CrashpadClient client;
 
@@ -52,12 +54,23 @@ void Crash()
 int main(int argc, char** argv)
 {
     std::string url("");
-    base::FilePath::StringType handler_path(L"");
-    base::FilePath::StringType db_path(L".");
+
+#if __linux__
+    base::FilePath::StringType handler_path(Environment::LINUX_CRASHPAD_HANDLER_PATH);
+    base::FilePath::StringType db_path(Environment::LINUX_CRASHPAD_DB_PATH);
+#else
+    base::FilePath::StringType handler_path(Environment::WINDOWS_CRASHPAD_HANDLER_PATH);
+    base::FilePath::StringType db_path(Environment::WINDOWS_CRASHPAD_DB_PATH);
+#endif //
 
     std::cout << "Crashpad URL: " << url << '\n';
-    std::wcout << "Crashpad handler: " << handler_path << '\n';
-    std::wcout << "Crashpad database: " << db_path << '\n';
+#if __linux__
+    std::cout << "Crashpad handler: " << handler_path << '\n';
+    std::cout << "Crashpad database: " << db_path << '\n';
+#else
+    std::wcout << L"Crashpad handler: " << handler_path << '\n';
+    std::wcout << L"Crashpad database: " << db_path << '\n';
+#endif //
     std::cout << (startCrashHandler(url, handler_path, db_path) ? "true" : "false") << '\n';
 
     int should_crash = 1;

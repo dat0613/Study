@@ -1,4 +1,7 @@
-add_executable(breakpad-test main.cpp)
+add_executable(breakpad-test 
+main.cpp
+private_environment.hpp
+)
 
 message("CMAKE_BINARY_DIR : ${CMAKE_BINARY_DIR}")
 message("CMAKE_CXX_COMPILER_ID : ${CMAKE_CXX_COMPILER_ID}")
@@ -18,6 +21,9 @@ PUBLIC
 	${CRASHPAD_CHROMEOS_BUILDFLAGS_INCLUDE_DIR}
 )
 
+message("CMAKE_CXX_COMPILER_ID : ${CMAKE_CXX_COMPILER_ID}")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 target_link_libraries(breakpad-test
 PUBLIC
 	"${CRASHPAD_LIBRARY_DIR}/client/common.lib"
@@ -25,3 +31,12 @@ PUBLIC
 	"${CRASHPAD_LIBRARY_DIR}/util/util.lib"
 	"${CRASHPAD_LIBRARY_DIR}/third_party/mini_chromium/mini_chromium/base/base.lib"
 )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+target_link_libraries(breakpad-test
+PUBLIC
+	"${CRASHPAD_LIBRARY_DIR}/client/libcommon.a"
+    "${CRASHPAD_LIBRARY_DIR}/client/libclient.a"
+	"${CRASHPAD_LIBRARY_DIR}/util/libutil.a"
+	"${CRASHPAD_LIBRARY_DIR}/third_party/mini_chromium/mini_chromium/base/libbase.a"
+)
+endif()
