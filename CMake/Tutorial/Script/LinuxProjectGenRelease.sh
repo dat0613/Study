@@ -1,1 +1,1 @@
-cmake -H./../src -B./../src/Generated/Linux -DCMAKE_BUILD_TYPE=RelWithDebInfo -G "Unix Makefiles"
+cmake -H./../src -B./../src/Generated/Linux -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"
