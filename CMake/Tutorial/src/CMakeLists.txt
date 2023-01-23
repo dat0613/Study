@@ -25,4 +25,3 @@ PUBLIC
 )
 
 target_include_directories(executable-example PUBLIC "${CMAKE_SOURCE_DIR}/static-library-example/include")
-target_compile_options(breakpad-test PRIVATE -g)

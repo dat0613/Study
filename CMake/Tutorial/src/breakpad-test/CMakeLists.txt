@@ -13,6 +13,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC" AND CMAKE_BUILD_TYPE MATCHES "Release")
 	target_link_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
 	target_link_options(breakpad-test PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
 endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_BUILD_TYPE MATCHES "Release")
+	target_compile_options(breakpad-test PRIVATE -g)
+endif()
 
 target_include_directories(breakpad-test
 PUBLIC
