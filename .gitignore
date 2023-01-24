@@ -35,3 +35,6 @@
 CMake/Tutorial/src/Generated
 CMake/Tutorial/src/.vs
 CMake/Tutorial/src/out
+Dotnet/DotnetSolution/.vs
+Dotnet/DotnetSolution/CrashReportingWeb/bin
+Dotnet/DotnetSolution/CrashReportingWeb/obj

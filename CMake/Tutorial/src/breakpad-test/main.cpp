@@ -28,20 +28,22 @@ static bool startCrashHandler(std::string const& url, base::FilePath::StringType
 
     annotations["format"] = "minidump";
     arguments.push_back("--no-rate-limit");
+    //arguments.push_back("--verbose");
+    //arguments.push_back("--log-to-stderr");
 
     base::FilePath db(db_path);
     base::FilePath handler(handler_path);
 
     database = crashpad::CrashReportDatabase::Initialize(db);
-
-    std::cerr << __LINE__ << '\n';
-
-    if (database == nullptr || database->GetSettings() == NULL)
+    if (nullptr == database)
         return false;
 
-    std::cerr << __LINE__ << '\n';
+    crashpad::Settings* setting = database->GetSettings();
+    if (nullptr == setting)
+        return false;
 
-    //database->GetSettings()->SetUploadsEnabled(true);
+    if (false == setting->SetUploadsEnabled(true))
+        return false;
 
     return client.StartHandler(handler, db, db, url, annotations, arguments, false, false);
 }
@@ -51,9 +53,17 @@ void Crash()
     memset((void*)(intptr_t)4, 123, 1);
 }
 
+bool LogMessageHandler(logging::LogSeverity severity, const char* file_poath, int line, size_t message_start, const std::string& string)
+{
+    std::cout << "Crashpad Log : " << string << std::endl;
+    return true;
+}
+
 int main(int argc, char** argv)
 {
-    std::string url("");
+    logging::SetLogMessageHandler(LogMessageHandler);
+
+    std::string url(Environment::CRASH_REPORTING_WEB_URL);
 
 #if __linux__
     base::FilePath::StringType handler_path(Environment::LINUX_CRASHPAD_HANDLER_PATH);
@@ -72,6 +82,9 @@ int main(int argc, char** argv)
     std::wcout << L"Crashpad database: " << db_path << '\n';
 #endif //
     std::cout << (startCrashHandler(url, handler_path, db_path) ? "true" : "false") << '\n';
+
+    while (false)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     int should_crash = 1;
     if (should_crash)

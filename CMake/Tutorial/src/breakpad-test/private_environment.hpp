@@ -8,6 +8,8 @@ namespace Environment
 
 	constexpr const wchar_t* WINDOWS_CRASHPAD_HANDLER_PATH = L"";
 	constexpr const wchar_t* WINDOWS_CRASHPAD_DB_PATH = L"";
+
+	constexpr const char* CRASH_REPORTING_WEB_URL = "";
 }
 
 #endif
