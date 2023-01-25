@@ -2,6 +2,17 @@
 using Microsoft.Extensions.Hosting;
 using System.Net.Http;
 
+using System.Diagnostics;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web;
+
+using System.Threading.Tasks;
+using System.IO.Compression;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
+
 namespace CrashReportingWeb.Controllers
 {
     [ApiController]
@@ -22,35 +33,42 @@ namespace CrashReportingWeb.Controllers
         [Route("upload/minidump")]
         public async void UploadMinidump()
         {
-            if (!Request.Body.CanRead || null == Request.QueryString.Value || !Request.QueryString.HasValue)
-                return;
-
-            string[] split = Request.QueryString.Value.Split("=");
-            if (split.Length < 2)
-                return;
-
-            // guid 형식 확인 필요
-            string guid = split[1];
-
-            byte[] buffer = new byte[1024];
-
-            string filePath = Path.Combine(@"C:\", @"upload\minidump");
-            string filePathWithName = Path.Combine(filePath, guid + ".dmp");
-            Directory.CreateDirectory(filePath);
-
-            int totalByteRead = 0;
-
-            using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
+            using (var stream = new GZipStream(Request.Body, CompressionMode.Decompress))
             {
-                while (Request.Body.CanRead)
+                var reader = new MultipartReader(Request.GetMultipartBoundary(), stream);
+                var section = await reader.ReadNextSectionAsync();
+                while (section != null)
                 {
-                    int readLength = await Request.Body.ReadAsync(buffer, 0, buffer.Length);
-                    await fileStream.WriteAsync(buffer, 0, readLength);
+                    try
+                    {
+                        byte[] buffer = new byte[1024];
 
-                    if (readLength < buffer.Length) 
+                        string filePath = Path.Combine(@"C:\", @"upload\minidump");
+                        string filePathWithName = Path.Combine(filePath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFFFFFF") + ".dmp");
+                        Directory.CreateDirectory(filePath);
+
+                        int totalByteRead = 0;
+
+                        using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
+                        {
+                            while (true)
+                            {
+                                int readLength = await section.Body.ReadAsync(buffer, 0, buffer.Length);
+                                await fileStream.WriteAsync(buffer);
+
+                                totalByteRead += readLength;
+
+                                if (readLength == 0)
+                                    break;
+                            }
+                        }
+
+                        section = await reader.ReadNextSectionAsync();
+                    }
+                    catch (ObjectDisposedException e)
+                    {
                         break;
-
-                    totalByteRead += readLength;
+                    }
                 }
             }
         }
