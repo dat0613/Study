@@ -1,25 +1,61 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System.Net.Http;
-
-using System.Diagnostics;
-using System.Net;
-using System.Threading.Tasks;
-using System.Web;
-
-using System.Threading.Tasks;
 using System.IO.Compression;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Http.Features;
+using System;
 
 namespace CrashReportingWeb.Controllers
 {
+
+    public static class MultipartRequestHelper
+    {
+        public static string GetBoundary(MediaTypeHeaderValue contentType, int lengthLimit)
+        {
+            var boundary = HeaderUtilities.RemoveQuotes(contentType.Boundary);
+            if (string.IsNullOrWhiteSpace(boundary.Value))
+            {
+                throw new InvalidDataException("Missing content-type boundary.");
+            }
+
+            if (boundary.Length > lengthLimit)
+            {
+                throw new InvalidDataException(
+                    $"Multipart boundary length limit {lengthLimit} exceeded.");
+            }
+
+            return boundary.Value;
+        }
+
+        public static bool IsMultipartContentType(string contentType)
+        {
+            return !string.IsNullOrEmpty(contentType)
+                   && contentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        public static bool HasFormDataContentDisposition(ContentDispositionHeaderValue contentDisposition)
+        {
+            return contentDisposition != null
+                   && contentDisposition.DispositionType.Equals("form-data")
+                   && string.IsNullOrEmpty(contentDisposition.FileName.Value)
+                   && string.IsNullOrEmpty(contentDisposition.FileNameStar.Value);
+        }
+
+        public static bool HasFileContentDisposition(ContentDispositionHeaderValue contentDisposition)
+        {
+            return contentDisposition != null
+                   && contentDisposition.DispositionType.Equals("form-data")
+                   && (!string.IsNullOrEmpty(contentDisposition.FileName.Value)
+                       || !string.IsNullOrEmpty(contentDisposition.FileNameStar.Value));
+        }
+    }
+
     [ApiController]
     [Route("[controller]")]
     public class CrashReportingController : ControllerBase
     {
-
+        private static readonly FormOptions _defaultFormOptions = new FormOptions();
         private readonly ILogger<CrashReportingController> _logger;
         private IWebHostEnvironment _hostingEnvironment;
 
@@ -31,46 +67,64 @@ namespace CrashReportingWeb.Controllers
 
         [HttpPost]
         [Route("upload/minidump")]
-        public async void UploadMinidump()
+        public async Task<IActionResult> UploadMinidump()
         {
-            using (var stream = new GZipStream(Request.Body, CompressionMode.Decompress))
+            try
             {
-                var reader = new MultipartReader(Request.GetMultipartBoundary(), stream);
-                var section = await reader.ReadNextSectionAsync();
-                while (section != null)
+                if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
+                    return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
+
+                using (var decompressedStream = new GZipStream(Request.Body, CompressionMode.Decompress))
                 {
-                    try
+                    MultipartReader reader = new MultipartReader(Request.GetMultipartBoundary(), decompressedStream);
+                    MultipartSection section = await reader.ReadNextSectionAsync();
+
+                    while (section != null)
                     {
-                        byte[] buffer = new byte[1024];
+                        bool hasContentDispositionHeader = ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition);
 
-                        string filePath = Path.Combine(@"C:\", @"upload\minidump");
-                        string filePathWithName = Path.Combine(filePath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFFFFFF") + ".dmp");
-                        Directory.CreateDirectory(filePath);
-
-                        int totalByteRead = 0;
-
-                        using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
+                        if (hasContentDispositionHeader)
                         {
-                            while (true)
+                            string filePath = Path.Combine(@"C:\", @"upload\minidump");
+                            string filePathWithName = Path.Combine(filePath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFFFFFF") + ".dmp");
+                            Directory.CreateDirectory(filePath);
+
+                            if (MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                             {
-                                int readLength = await section.Body.ReadAsync(buffer, 0, buffer.Length);
-                                await fileStream.WriteAsync(buffer);
+                                Stream gzipStream = section.Body;
+                                int totalByteRead = 0;
 
-                                totalByteRead += readLength;
 
-                                if (readLength == 0)
-                                    break;
+                                using (StreamReader streamReader = new StreamReader(decompressedStream))
+                                {
+                                    using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
+                                    {
+                                        while (true)
+                                        {
+                                            char[] bytes = new char[1024];
+                                            int readBytes = await streamReader.ReadAsync(bytes);
+                                            if (readBytes == 0)
+                                                break;
+
+                                            await fileStream.WriteAsync(bytes.Select(b => (byte)b).ToArray());// LINQ는 좀 더 고려해봐야 할듯
+
+                                            totalByteRead += readBytes;
+                                        }
+                                    }
+                                }
                             }
                         }
 
                         section = await reader.ReadNextSectionAsync();
                     }
-                    catch (ObjectDisposedException e)
-                    {
-                        break;
-                    }
                 }
             }
+            catch (Exception ex)
+            {// 뭔가 로그를 찍어야 함
+                return BadRequest($"Exception!! {ex.Message}");
+            }
+
+            return Ok();
         }
 
         [HttpPost]
