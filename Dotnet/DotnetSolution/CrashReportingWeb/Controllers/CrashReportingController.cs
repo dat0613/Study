@@ -71,10 +71,13 @@ namespace CrashReportingWeb.Controllers
         {
             try
             {
+                if (null == Request.ContentType)
+                    return BadRequest($"Unknown ContentType");
+
                 if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
                     return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
 
-                using (var decompressedStream = new GZipStream(Request.Body, CompressionMode.Decompress))
+                using (GZipStream decompressedStream = new GZipStream(Request.Body, CompressionMode.Decompress))
                 {
                     MultipartReader reader = new MultipartReader(Request.GetMultipartBoundary(), decompressedStream);
                     MultipartSection section = await reader.ReadNextSectionAsync();
@@ -85,32 +88,24 @@ namespace CrashReportingWeb.Controllers
 
                         if (hasContentDispositionHeader)
                         {
-                            string filePath = Path.Combine(@"C:\", @"upload\minidump");
-                            string filePathWithName = Path.Combine(filePath, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFFFFFF") + ".dmp");
-                            Directory.CreateDirectory(filePath);
 
                             if (MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                             {
-                                Stream gzipStream = section.Body;
+                                string filePath = @"C:\upload\minidump";
+                                string filePathWithName = Path.Combine(filePath, contentDisposition.FileName.Value);
+                                Directory.CreateDirectory(filePath);
+                                int readBytes = 0;
                                 int totalByteRead = 0;
+                                byte[] buffer = new byte[1024];
 
-
-                                using (StreamReader streamReader = new StreamReader(decompressedStream))
+                                using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
                                 {
-                                    using (Stream fileStream = new FileStream(filePathWithName, FileMode.Append, FileAccess.Write))
+                                    do
                                     {
-                                        while (true)
-                                        {
-                                            char[] bytes = new char[1024];
-                                            int readBytes = await streamReader.ReadAsync(bytes);
-                                            if (readBytes == 0)
-                                                break;
-
-                                            await fileStream.WriteAsync(bytes.Select(b => (byte)b).ToArray());// LINQ는 좀 더 고려해봐야 할듯
-
-                                            totalByteRead += readBytes;
-                                        }
-                                    }
+                                        readBytes = await section.Body.ReadAsync(buffer, 0, buffer.Length);
+                                        await fileStream.WriteAsync(buffer, 0, readBytes);
+                                        totalByteRead += readBytes;
+                                    } while (readBytes > 0);
                                 }
                             }
                         }
