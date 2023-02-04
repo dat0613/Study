@@ -16,9 +16,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-#if !DEBUG
-app.UseHttpsRedirection();
-#endif
+// 인증서 이슈로 귀찮아서 항상 HTTP 열어둠
+//#if !DEBUG
+//app.UseHttpsRedirection();
+//#endif
 
 app.UseAuthorization();
 
