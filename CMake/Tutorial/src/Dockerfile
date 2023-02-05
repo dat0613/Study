@@ -19,7 +19,7 @@ COPY ./ /build_files
 WORKDIR /build_files
 
 # 빌드
-RUN cd /build_files && cmake -H./ -B./Generated/Linux \
+RUN cmake -H./ -B./Generated/Linux \
 -DCMAKE_BUILD_TYPE:STRING="Release" \
 -DCRASHPAD_INCLUDE_DIR:FILEPATH="/download/crashpad/crashpad" \
 -DCRASHPAD_MINI_CHROMIUM_INCLUDE_DIR:FILEPATH="/download/crashpad/crashpad/third_party/mini_chromium/mini_chromium" \
@@ -29,4 +29,4 @@ RUN cd /build_files && cmake -H./ -B./Generated/Linux \
 RUN cmake --build ./Generated/Linux
 
 # 바이너리 실행
-CMD ["./Generated/Linux/executable-example/executable-example"]
+CMD ["./Generated/Linux/breakpad-test/breakpad-test"]
