@@ -17,6 +17,7 @@ add_subdirectory(executable-example)
 add_subdirectory(shared-library-example)
 add_subdirectory(static-library-example)
 add_subdirectory(breakpad-test)
+add_subdirectory(modern-cpp)
 
 add_dependencies(executable-example static-library-example)
 target_link_libraries(executable-example 
