@@ -1,1 +1,1 @@
-cmake . -G"Visual Studio 17 2022" -Bout/
+cmake . -G"Visual Studio 17 2022" -DSDL2_INCLUDE_DIR="C:\Program Files (x86)\SDL2-2.26.3\include" -DSDL2_LIBRARY_DIR="C:\Program Files (x86)\SDL2-2.26.3\lib\x64" -Bout/
