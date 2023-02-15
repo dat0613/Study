@@ -1,9 +1,30 @@
 #include "Base/GameBase.hpp"
+#include <chrono>
 
 int main(int argv, char** args)
 {
+	bool running = false;
 	GameBase base;
-	base.Initialize("test", 800, 600);
+	if (!base.Initialize("test", 800, 600))
+		return -1;
+
+	std::chrono::high_resolution_clock timer;
+
+	float deltaTime = 0.0f;
+
+	while (true)
+	{
+		auto start = timer.now();
+
+		if (!base.Update(deltaTime))
+			break;
+
+		if (!base.Render())
+			break;
+
+		auto stop = timer.now();
+		deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() / 1000.0f;
+	}
 
 	return 0;
 }

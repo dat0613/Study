@@ -4,6 +4,11 @@ set(SOURCE_LIST
 	"src/Base/GameBase.hpp"
 	"src/Base/Renderer.cpp"
 	"src/Base/Renderer.hpp"
+	"src/Base/Layer.cpp"
+	"src/Base/Layer.hpp"
+	"src/Base/Event.cpp"
+	"src/Base/Event.hpp"
+	"src/Base/Delegate.hpp"
 )
 
 add_executable(test ${SOURCE_LIST})
