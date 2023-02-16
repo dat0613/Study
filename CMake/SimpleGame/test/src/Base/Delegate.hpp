@@ -2,11 +2,7 @@ template <class Return, class ... Args>
 class delegate
 {
 public:
-    delegate()
-        : object_ptr(nullptr)
-        , stub_ptr(nullptr)
-		, stub_non_member_ptr(nullptr)
-    {}
+    delegate() : object_ptr(nullptr), stub_ptr(nullptr), stub_non_member_ptr(nullptr) {}
 
 	// 멤버 함수를 등록할 때 사용
     template <class T, Return(T::* function)(Args ...)>

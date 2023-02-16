@@ -1,11 +1,13 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-template<class ... Args>
+#include <vector>
+#include "Delegate.hpp"
+
 class EventSpeaker
 {
 public:
-
+	std::vector<delegate<void, >>
 private:
 	
 };

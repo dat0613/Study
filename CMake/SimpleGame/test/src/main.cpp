@@ -16,6 +16,8 @@ int main(int argv, char** args)
 	{
 		auto start = timer.now();
 
+		base.EventHandling();
+
 		if (!base.Update(deltaTime))
 			break;
 

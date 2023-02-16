@@ -1,5 +1,10 @@
 #include "GameBase.hpp"
 
+GameBase::GameBase() : shutDown(false)
+{
+
+}
+
 GameBase::~GameBase()
 {
 	SDL_Quit();
@@ -10,28 +15,68 @@ bool GameBase::Initialize(const char* title, unsigned __int32 width, unsigned __
 	if (0 != SDL_Init(SDL_INIT_EVERYTHING))
 		return false;
 
-	return renderer.Initialize(title, width, height);
+	if (false == renderer.Initialize(title, width, height))
+		return false;
+
+	AttachEventHandler(SDL_EventType::SDL_QUIT, EventHandler::from_method<GameBase, &GameBase::OnQuitEvent>(this));
+
+	return true;
 }
 
 bool GameBase::Update(float deltaTime)
 {
+	if (shutDown)
+		return false;
+
+	return layer.Update(deltaTime);
+}
+
+void GameBase::EventHandling()
+{
 	SDL_Event event;
+
 	while (SDL_PollEvent(NULL))
 	{
 		SDL_PollEvent(&event);
 
-		switch (event.type)
+		auto pair = handlerMap.find(static_cast<SDL_EventType>(event.type));
+		if (handlerMap.end() != pair)
 		{
-		case SDL_QUIT:
-			return false;
-			break;
+			for (auto del : pair->second)
+			{
+				del(event, *this);
+			}
 		}
 	}
-
-	return layer.Update(deltaTime);
 }
 
 bool GameBase::Render()
 {
 	return renderer.Render();
+}
+
+void GameBase::AttachEventHandler(SDL_EventType eventType, EventHandler&& handler)
+{
+	auto pair = handlerMap.find(eventType);
+	if (handlerMap.end() != pair)
+	{
+		pair->second.push_back(handler);
+	}
+	else
+	{
+		std::vector<EventHandler> handlerVector;// ...?
+		handlerVector.reserve(10);
+		handlerVector.push_back(handler);
+		handlerMap.emplace(eventType, handlerVector);
+	}
+}
+
+void GameBase::ShutDown()
+{
+	shutDown = true;
+}
+
+void GameBase::OnQuitEvent(const SDL_Event& event, GameBase& gameBase)
+{
+	gameBase.ShutDown();
 }
