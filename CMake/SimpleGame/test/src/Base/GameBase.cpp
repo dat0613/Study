@@ -18,7 +18,7 @@ bool GameBase::Initialize(const char* title, unsigned __int32 width, unsigned __
 	if (false == renderer.Initialize(title, width, height))
 		return false;
 
-	AttachEventHandler(SDL_EventType::SDL_QUIT, EventHandler::from_method<GameBase, &GameBase::OnQuitEvent>(this));
+	SDLEventcaster.Attach(SDL_EventType::SDL_QUIT, SDLEventBroadcaster::EventHandler::from_method<GameBase, &GameBase::OnQuitEvent>(this));
 
 	return true;
 }
@@ -39,14 +39,7 @@ void GameBase::EventHandling()
 	{
 		SDL_PollEvent(&event);
 
-		auto pair = handlerMap.find(static_cast<SDL_EventType>(event.type));
-		if (handlerMap.end() != pair)
-		{
-			for (auto del : pair->second)
-			{
-				del(event, *this);
-			}
-		}
+		SDLEventcaster.Broadcast(static_cast<SDL_EventType>(event.type), event);
 	}
 }
 
@@ -55,28 +48,12 @@ bool GameBase::Render()
 	return renderer.Render();
 }
 
-void GameBase::AttachEventHandler(SDL_EventType eventType, EventHandler&& handler)
-{
-	auto pair = handlerMap.find(eventType);
-	if (handlerMap.end() != pair)
-	{
-		pair->second.push_back(handler);
-	}
-	else
-	{
-		std::vector<EventHandler> handlerVector;// ...?
-		handlerVector.reserve(10);
-		handlerVector.push_back(handler);
-		handlerMap.emplace(eventType, handlerVector);
-	}
-}
-
 void GameBase::ShutDown()
 {
 	shutDown = true;
 }
 
-void GameBase::OnQuitEvent(const SDL_Event& event, GameBase& gameBase)
+void GameBase::OnQuitEvent(const SDL_Event& event)
 {
-	gameBase.ShutDown();
+	ShutDown();
 }

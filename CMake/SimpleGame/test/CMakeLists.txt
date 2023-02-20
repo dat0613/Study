@@ -6,9 +6,8 @@ set(SOURCE_LIST
 	"src/Base/Renderer.hpp"
 	"src/Base/Layer.cpp"
 	"src/Base/Layer.hpp"
-	"src/Base/Event.cpp"
-	"src/Base/Event.hpp"
 	"src/Base/Delegate.hpp"
+	"src/Base/EventBroadcaster.hpp"
 )
 
 add_executable(test ${SOURCE_LIST})
