@@ -7,8 +7,11 @@ Renderer::Renderer() : window(nullptr), renderer(nullptr)
 
 Renderer::~Renderer()
 {
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	if (nullptr != renderer)
+		SDL_DestroyRenderer(renderer);
+
+	if (nullptr != window)
+		SDL_DestroyWindow(window);
 }
 
 bool Renderer::Initialize(const char* title, unsigned __int32 width, unsigned __int32 height)
@@ -27,4 +30,8 @@ bool Renderer::Initialize(const char* title, unsigned __int32 width, unsigned __
 bool Renderer::Render()
 {
 	return true;
+}
+
+void Renderer::Release()
+{
 }

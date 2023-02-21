@@ -12,6 +12,7 @@ public:
 
 	bool Initialize(const char* title, unsigned __int32 width, unsigned __int32 height);
 	bool Render();
+	void Release();
 
 private:
 

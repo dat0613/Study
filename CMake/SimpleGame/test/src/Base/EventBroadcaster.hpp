@@ -1,12 +1,14 @@
 #include "Delegate.hpp"
 #include <map>
 
-template <class EventType, class EventObject>
+template <class _EventType, class _EventObject>
 class EventBroadcaster
 {
 public:
 	using Identity = int;
 	static constexpr int Identity_null = -1;
+	using EventType = _EventType;
+	using EventObject = _EventObject;
 	using EventHandler = delegate<void, const EventObject&>;
 	using EventHandlerMap = std::map<EventType, std::map<Identity, EventHandler>>;
 	using EventHandlerSearchHint = std::map<Identity, EventType>;// HandlerMap에서 iterator 돌리는건 싫어서 이걸로 map을 찾아감

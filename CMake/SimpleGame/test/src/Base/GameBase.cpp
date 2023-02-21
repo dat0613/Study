@@ -1,6 +1,6 @@
 #include "GameBase.hpp"
 
-GameBase::GameBase() : shutDown(false)
+GameBase::GameBase() : layer(SDLEventcaster), shutDown(false)
 {
 
 }
@@ -19,6 +19,8 @@ bool GameBase::Initialize(const char* title, unsigned __int32 width, unsigned __
 		return false;
 
 	SDLEventcaster.Attach(SDL_EventType::SDL_QUIT, SDLEventBroadcaster::EventHandler::from_method<GameBase, &GameBase::OnQuitEvent>(this));
+
+	layer.Initialize();
 
 	return true;
 }
@@ -53,7 +55,18 @@ void GameBase::ShutDown()
 	shutDown = true;
 }
 
-void GameBase::OnQuitEvent(const SDL_Event& event)
+void GameBase::Release()
+{
+	layer.Release();
+	renderer.Release();
+}
+
+SDLEventBroadcaster& GameBase::GetSDLEventcaster()
+{
+	return SDLEventcaster;
+}
+
+void GameBase::OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject)
 {
 	ShutDown();
 }

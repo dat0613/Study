@@ -1,5 +1,6 @@
 set(SOURCE_LIST
 	"src/main.cpp"
+	"src/Base/Type.hpp"
 	"src/Base/GameBase.cpp"
 	"src/Base/GameBase.hpp"
 	"src/Base/Renderer.cpp"
@@ -8,6 +9,9 @@ set(SOURCE_LIST
 	"src/Base/Layer.hpp"
 	"src/Base/Delegate.hpp"
 	"src/Base/EventBroadcaster.hpp"
+	"src/Component/Transform.hpp"
+	"src/Component/PlayerInput.hpp"
+	"src/Component/Animation.hpp"
 )
 
 add_executable(test ${SOURCE_LIST})

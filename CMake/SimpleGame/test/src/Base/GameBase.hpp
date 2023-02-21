@@ -1,11 +1,9 @@
 #ifndef GAMEBASE_HPP
 #define GAMEBASE_HPP
 
+#include "Type.hpp"
 #include "Layer.hpp"
 #include "Renderer.hpp"
-#include "EventBroadcaster.hpp"
-
-using SDLEventBroadcaster = EventBroadcaster<SDL_EventType, SDL_Event>;
 
 class GameBase
 {
@@ -17,9 +15,12 @@ public:
 	void EventHandling();
 	bool Render();
 	void ShutDown();
+	void Release();
+
+	SDLEventBroadcaster& GetSDLEventcaster();
 
 private:
-	void OnQuitEvent(const SDL_Event& event);
+	void OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject);
 
 	Layer layer;
 	Renderer renderer;

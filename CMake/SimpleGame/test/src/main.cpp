@@ -28,5 +28,7 @@ int main(int argv, char** args)
 		deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() / 1000.0f;
 	}
 
+	base.Release();
+
 	return 0;
 }
