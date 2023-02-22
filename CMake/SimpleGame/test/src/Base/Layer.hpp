@@ -2,6 +2,7 @@
 #define LAYER_HPP
 
 #include <entt/entt.hpp>
+#include "../System/System.hpp"
 #include "Type.hpp"
 
 class Layer
@@ -16,6 +17,7 @@ public:
 private:
 	entt::entity makePlayer();
 
+	std::vector<System*> systems;
 	entt::registry registry;
 	SDLEventBroadcaster& caster;
 };

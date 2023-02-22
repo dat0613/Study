@@ -1,7 +1,7 @@
 #include "Layer.hpp"
 #include "../Component/Transform.hpp"
 #include "../Component/Animation.hpp"
-#include "../Component/PlayerInput.hpp"
+#include "../System/PlayerInputSystem.hpp"
 
 Layer::Layer(SDLEventBroadcaster& caster) : caster(caster) {}
 
@@ -9,16 +9,26 @@ bool Layer::Initialize()
 {
 	makePlayer();
 
+	systems.reserve(10);
+	systems.push_back(new PlayerInputSystem(caster));
+	
 	return true;
 }
 
 bool Layer::Update(float deltaTime)
 {
+	for (System* system : systems)
+		system->Execute(registry, deltaTime);
+
 	return true;
 }
 
 void Layer::Release()
 {
+	for (System* system : systems)
+		delete system;
+
+	systems.clear();
 	registry.clear();
 }
 
@@ -28,7 +38,6 @@ entt::entity Layer::makePlayer()
 
 	registry.emplace<Transform>(entity);
 	registry.emplace<Animation>(entity);
-	registry.emplace<PlayerInput>(entity, caster);
 
 	return entity;
 }
