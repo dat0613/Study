@@ -13,6 +13,7 @@ public:
 	bool Initialize();
 	bool Update(float deltaTime);
 	void Release();
+	entt::registry& GetRegistry();
 
 private:
 	entt::entity makePlayer();

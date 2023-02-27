@@ -1,6 +1,7 @@
 #include "Layer.hpp"
 #include "../Component/Transform.hpp"
 #include "../Component/Animation.hpp"
+#include "../Component/Player.hpp"
 #include "../System/PlayerInputSystem.hpp"
 
 Layer::Layer(SDLEventBroadcaster& caster) : caster(caster) {}
@@ -32,12 +33,18 @@ void Layer::Release()
 	registry.clear();
 }
 
+entt::registry& Layer::GetRegistry()
+{
+	return registry;
+}
+
 entt::entity Layer::makePlayer()
 {
 	const entt::entity entity = registry.create();
 
 	registry.emplace<Transform>(entity);
 	registry.emplace<Animation>(entity);
+	registry.emplace<Player>(entity);
 
 	return entity;
 }

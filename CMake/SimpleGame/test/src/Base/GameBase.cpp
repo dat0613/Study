@@ -41,7 +41,7 @@ void GameBase::EventHandling()
 	{
 		SDL_PollEvent(&event);
 
-		SDLEventcaster.Broadcast(static_cast<SDL_EventType>(event.type), event);
+		SDLEventcaster.Broadcast(static_cast<SDL_EventType>(event.type), event, layer.GetRegistry());
 	}
 }
 
@@ -66,7 +66,7 @@ SDLEventBroadcaster& GameBase::GetSDLEventcaster()
 	return SDLEventcaster;
 }
 
-void GameBase::OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject)
+void GameBase::OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject, entt::registry& registry)
 {
 	ShutDown();
 }

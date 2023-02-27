@@ -4,6 +4,8 @@
 #include "../Base/Type.hpp"
 #include <vector>
 #include "System.hpp"
+#include "../Component/Transform.hpp"
+#include "../Component/Player.hpp"
 
 class PlayerInputSystem final : public System
 {
@@ -13,10 +15,10 @@ public:
 		SDLEventBroadcaster::Identity identity = SDLEventBroadcaster::Identity_null;
 		handlerIdentityVector.reserve(2);
 
-		identity = caster.Attach(SDLEventBroadcaster::EventType::SDL_KEYDOWN, SDLEventBroadcaster::EventHandler::from_method<PlayerInput, &PlayerInput::KeyDownHandler>(this));
+		identity = caster.Attach(SDLEventBroadcaster::EventType::SDL_KEYDOWN, SDLEventBroadcaster::EventHandler::from_method<PlayerInputSystem, &PlayerInputSystem::KeyDownHandler>(this));
 		handlerIdentityVector.push_back(identity);
 
-		identity = caster.Attach(SDLEventBroadcaster::EventType::SDL_KEYUP, SDLEventBroadcaster::EventHandler::from_method<PlayerInput, &PlayerInput::KeyUpHandler>(this));
+		identity = caster.Attach(SDLEventBroadcaster::EventType::SDL_KEYUP, SDLEventBroadcaster::EventHandler::from_method<PlayerInputSystem, &PlayerInputSystem::KeyUpHandler>(this));
 		handlerIdentityVector.push_back(identity);
 	}
 
@@ -32,14 +34,18 @@ public:
 	}
 
 private:
-	void KeyDownHandler(const SDLEventBroadcaster::EventObject& eventObject)
+	void KeyDownHandler(const SDLEventBroadcaster::EventObject& eventObject, entt::registry& registry)
 	{
-		
+		auto view = registry.view<Player, Transform>();
+
+		for (auto entity : view)
+		{
+			auto& transform = view.get<Transform>(entity);
+		}
 	}
 
-	void KeyUpHandler(const SDLEventBroadcaster::EventObject& eventObject)
+	void KeyUpHandler(const SDLEventBroadcaster::EventObject& eventObject, entt::registry& registry)
 	{
-
 	}
 
 	SDLEventBroadcaster& caster;

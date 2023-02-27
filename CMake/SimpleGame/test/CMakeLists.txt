@@ -10,7 +10,7 @@ set(SOURCE_LIST
 	"src/Base/Delegate.hpp"
 	"src/Base/EventBroadcaster.hpp"
 	"src/Component/Transform.hpp"
-	"src/Component/PlayerInput.hpp"
+	"src/Component/Player.hpp"
 	"src/Component/Animation.hpp"
 	"src/System/System.hpp"
 	"src/System/PlayerInputSystem.hpp"

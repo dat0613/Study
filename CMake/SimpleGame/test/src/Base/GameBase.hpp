@@ -20,7 +20,7 @@ public:
 	SDLEventBroadcaster& GetSDLEventcaster();
 
 private:
-	void OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject);
+	void OnQuitEvent(const SDLEventBroadcaster::EventObject& eventObject, entt::registry& registry);
 
 	Layer layer;
 	Renderer renderer;

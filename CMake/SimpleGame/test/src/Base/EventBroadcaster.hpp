@@ -1,7 +1,7 @@
 #include "Delegate.hpp"
 #include <map>
 
-template <class _EventType, class _EventObject>
+template <class _EventType, class _EventObject, class _OtherObject>
 class EventBroadcaster
 {
 public:
@@ -9,7 +9,8 @@ public:
 	static constexpr int Identity_null = -1;
 	using EventType = _EventType;
 	using EventObject = _EventObject;
-	using EventHandler = delegate<void, const EventObject&>;
+	using OtherObject = _OtherObject;
+	using EventHandler = delegate<void, const EventObject&, _OtherObject&>;
 	using EventHandlerMap = std::map<EventType, std::map<Identity, EventHandler>>;
 	using EventHandlerSearchHint = std::map<Identity, EventType>;// HandlerMap에서 iterator 돌리는건 싫어서 이걸로 map을 찾아감
 
@@ -51,14 +52,14 @@ public:
 		handlerPair->second.erase(identity);
 	}
 
-	void Broadcast(EventType eventType, EventObject& eventObject)
+	void Broadcast(EventType eventType, EventObject& eventObject, OtherObject& otherObject)
 	{
 		auto pair = handlerMap.find(eventType);
 		if (handlerMap.end() != pair)
 		{
 			for (auto& del : pair->second)
 			{
-				del.second(eventObject);
+				del.second(eventObject, otherObject);
 			}
 		}
 	}

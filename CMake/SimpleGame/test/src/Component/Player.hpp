@@ -4,7 +4,7 @@
 #include "../Base/Type.hpp"
 #include <vector>
 
-class PlayerInput
+class Player
 {
 
 };
