@@ -14,6 +14,7 @@ set(SOURCE_LIST
 	"src/Component/Animation.hpp"
 	"src/System/System.hpp"
 	"src/System/PlayerInputSystem.hpp"
+	"src/Resource/Resource.hpp"
 )
 
 add_executable(test ${SOURCE_LIST})

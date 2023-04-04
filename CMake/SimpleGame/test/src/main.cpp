@@ -25,7 +25,7 @@ int main(int argv, char** args)
 			break;
 
 		auto stop = timer.now();
-		deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() / 1000.0f;
+		deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() * 0.001f;
 	}
 
 	base.Release();

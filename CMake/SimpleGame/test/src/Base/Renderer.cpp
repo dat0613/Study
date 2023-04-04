@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include "../Resource/Resource.hpp"
 
 Renderer::Renderer() : window(nullptr), renderer(nullptr)
 {
@@ -24,11 +25,21 @@ bool Renderer::Initialize(const char* title, unsigned __int32 width, unsigned __
 	if (nullptr == renderer)
 		return false;
 
+	// Resource::Texture::GetPath(Resource::Texture::Type::Box);
+	// 여기서 뭔가 로드
+
 	return true;
 }
 
 bool Renderer::Render()
 {
+	SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
+	SDL_RenderClear(renderer);
+
+
+
+	SDL_RenderPresent(renderer);
+
 	return true;
 }
 
