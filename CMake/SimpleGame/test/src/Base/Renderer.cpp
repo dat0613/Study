@@ -46,3 +46,12 @@ bool Renderer::Render()
 void Renderer::Release()
 {
 }
+
+Renderer::Texture Renderer::LoadTexture(const char* path)
+{
+	auto texture = Renderer::Texture(SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, 0, 0));
+	SDL_UpdateTexture(texture.get(), nullptr, texture.get(), 0);
+	SDL_SetTextureBlendMode(texture.get(), SDL_BLENDMODE_BLEND);
+
+	return texture;
+}

@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 #include <string>
+#include <memory>
+#include <map>
 
 class Renderer
 {
@@ -16,8 +18,21 @@ public:
 
 private:
 
+	struct DeleteTexture
+	{
+		void operator()(SDL_Texture* ptr) const noexcept
+		{
+			if (nullptr != ptr)
+				SDL_DestroyTexture(ptr);
+		}
+	};
+	using Texture = std::unique_ptr<SDL_Texture, DeleteTexture>;
+
+	Texture LoadTexture(const char* path);
+
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	std::map<int, Texture> textures;
 };
 
 #endif

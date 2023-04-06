@@ -9,13 +9,19 @@ namespace Resource
 		enum Type
 		{
 			Begin = 0,
-			Box = Begin,
+			Skyblue,
+			Orange,
+			Blue,
+			Yellow,
+			Green,
+			Purple,
+			Red,
 			End
 		};
 
 		constexpr std::array<const char*, static_cast<int>(Type::End)> Path 
 		{
-			""
+			"",
 		};
 
 		const char* GetPath(Type type)
