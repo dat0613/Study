@@ -15,6 +15,7 @@ set(SOURCE_LIST
 	"src/System/System.hpp"
 	"src/System/PlayerInputSystem.hpp"
 	"src/Resource/Resource.hpp"
+	"src/Resource/Helper.hpp"
 )
 
 add_executable(test ${SOURCE_LIST})
@@ -30,6 +31,10 @@ endif()
 
 message("SDL2_INCLUDE_DIR : ${SDL2_INCLUDE_DIR}")
 message("SDL2_LIBRARY_DIR : ${SDL2_LIBRARY_DIR}")
+message("CMAKE_BINARY_DIR : ${CMAKE_BINARY_DIR}")
+
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set_property(TARGET test PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Debug")
 
 target_include_directories(test
 PUBLIC

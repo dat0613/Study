@@ -1,11 +1,12 @@
 #include "Base/GameBase.hpp"
+#include "Resource/Helper.hpp"
 #include <chrono>
 
 int main(int argv, char** args)
 {
 	bool running = false;
 	GameBase base;
-	if (!base.Initialize("test", 800, 600))
+	if (!base.Initialize("test", GameValue::Window.width, GameValue::Window.height))
 		return -1;
 
 	std::chrono::high_resolution_clock timer;
